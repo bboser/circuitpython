@@ -151,6 +151,8 @@ SRC_COMMON_HAL += \
 	supervisor/Runtime.c \
 	supervisor/__init__.c \
 	time/__init__.c \
+	timer/Timer.c \
+	timer/__init__.c \
 
 ifneq ($(SD), )
 SRC_COMMON_HAL += \
@@ -214,6 +216,7 @@ SRC_SHARED_BINDINGS = \
 	bitbangio/SPI.c \
 	bitbangio/OneWire.c \
 	random/__init__.c \
+	timer/Chronometer.c \
 
 # USB source files for nrf52840
 ifeq ($(MCU_SUB_VARIANT),nrf52840)
