@@ -11,6 +11,7 @@
 [submodule "lib/berkeley-db-1.xx"]
 	path = lib/berkeley-db-1.xx
 	url = https://github.com/pfalcon/berkeley-db-1.xx
+	ignore = dirty
 [submodule "lib/uzlib"]
 	path = lib/uzlib
 	url = https://github.com/pfalcon/uzlib

@@ -1,49 +1,34 @@
-Adafruit CircuitPython API Reference
+IoT-Python
 ====================================
 
-Welcome to the API reference documentation for Adafruit CircuitPython.
-This contains low-level API reference docs which may link out to separate
-*"getting started"* guides. `Adafruit <https://adafruit.com>`_ has many
-excellent tutorials available through the
-`Adafruit Learning System <https://learn.adafruit.com/>`_.
+**IoT-Python** adds features not currently supported in  **CircuitPython** (e.g. interrupts) and is otherwise identical. The motivation for the different name is to avoid confusion: code following the CircuitPython API (should) run on IoT-Python, but the opposite is not necessarily true.
 
-.. include:: ../README.rst
+`Adafruit's <https://www.adafruit.com>`_ **CircuitPython** is an open source derivative of `MicroPython <https://micropython.org>`_. CircuitPython features unified Python core APIs and a growing list of Adafruit libraries and drivers that work with it. Check Adafruit's `documentation <https://circuitpython.readthedocs.io>`_ and `GitHub repository <https://github.com/adafruit/circuitpython>`_ for information about CircuitPython.
 
-.. _contents:
+Status
+------
 
-Full Table of Contents
+This project is experimental. Expect changes, except for CircuitPython APIs which should be stable going forward. Those that change will change on major version numbers such as 3.0.0 and 4.0.0.
+
+Supported Boards
+----------------
+
+**nRF52840 Boards**
+
+.. _content:
+
+Content
 ----------------------
 
 .. toctree::
    :maxdepth: 3
-   :caption: API and Usage
+   :caption: API
 
    ../shared-bindings/index.rst
-   supported_ports.rst
-   troubleshooting.rst
-   drivers.rst
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Design and porting reference
-
-   design_guide
-   porting
-   common_hal
-
-.. toctree::
-   :maxdepth: 2
-   :caption: MicroPython specific
-
-   library/index.rst
-
-.. toctree::
-   :maxdepth: 1
-   :caption: About the project
-
-   ../README
-   ../CONTRIBUTING
-   ../CODE_OF_CONDUCT
+   ./drivers.rst
+   ./library/index.rst
+   MicroPython-Lib <https://github.com/micropython/micropython-lib>
+   ./troubleshooting.rst
    ../license.rst
 
 Indices and tables
