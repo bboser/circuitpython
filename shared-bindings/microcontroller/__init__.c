@@ -135,12 +135,23 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(mcu_on_next_reset_obj, mcu_on_next_reset);
 //| .. method:: deepsleep()
 //|
 //|   Power saving mode: halts CPU, resumes execution (statement after this
-//|   call) on interrupt.
+//|   call) on interrupt. Also stops system timer (time.monotonic won't update).
 //|
 //|   Interrupt sources include timers, gpio events, usb events, ...
 //|
 //|   Note: CPU current drops to ~ 3uA (assuming no I/O activity such as PWM).
 //|   The nRF52840 offers even lower power modes (without RAM retention, etc).
+//|
+//|   Example:
+//|   deepsleep for 5 seconds, wakeup by timer (assuming no other earlier events).
+//|
+//|       from timer import Timer
+//|       from microcontroller import deepsleep
+//|
+//|       t = Timer(period=int(5*1e6), mode=Timer.ONESHOT)
+//|       t.start()
+//|       deepsleep()   # reduced cpu current consumption
+//|       # execution resumes after 5 seconds (or an earlier interrupt)
 //|
 STATIC mp_obj_t deepsleep(void) {
     __SEV();
