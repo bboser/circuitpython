@@ -18,9 +18,11 @@ Supported Boards
 Change Log
 ----------
 
-- add boards/particle_nrf52840
+- add boards/particle_mesh
 - add timer module (including interrupts)
-- enabled scheduler & emergency exception buffer
+- enable scheduler & emergency exception buffer
+- enable ure, ujson libraries
+- add microcontroller.deepsleep()
 
 Known Bugs
 ----------

@@ -132,6 +132,24 @@ STATIC mp_obj_t mcu_on_next_reset(mp_obj_t run_mode_obj) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(mcu_on_next_reset_obj, mcu_on_next_reset);
 
+//| .. method:: deepsleep()
+//|
+//|   Power saving mode: halts CPU, resumes execution (statement after this
+//|   call) on interrupt.
+//|
+//|   Interrupt sources include timers, gpio events, usb events, ...
+//|
+//|   Note: CPU current drops to ~ 3uA (assuming no I/O activity such as PWM).
+//|   The nRF52840 offers even lower power modes (without RAM retention, etc).
+//|
+STATIC mp_obj_t deepsleep(void) {
+    __SEV();
+    __WFE();
+    __WFE();
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(deepsleep_obj, deepsleep);
+
 //| .. method:: reset()
 //|
 //|   Reset the microcontroller. After reset, the microcontroller will enter the
@@ -170,6 +188,7 @@ const mp_obj_module_t mcu_pin_module = {
 
 STATIC const mp_rom_map_elem_t mcu_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_microcontroller) },
+    { MP_ROM_QSTR(MP_QSTR_deepsleep),  MP_ROM_PTR(&deepsleep_obj) },
     { MP_ROM_QSTR(MP_QSTR_cpu),  MP_ROM_PTR(&common_hal_mcu_processor_obj) },
     { MP_ROM_QSTR(MP_QSTR_delay_us), MP_ROM_PTR(&mcu_delay_us_obj) },
     { MP_ROM_QSTR(MP_QSTR_disable_interrupts), MP_ROM_PTR(&mcu_disable_interrupts_obj) },
