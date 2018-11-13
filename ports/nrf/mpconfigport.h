@@ -53,6 +53,11 @@
 #define MICROPY_OPT_CACHE_MAP_LOOKUP_IN_BYTECODE (0)
 #define MICROPY_OPT_MPZ_BITWISE                  (0)
 
+// timer.Timer needs scheduler for "heap safe" interrupts
+#define MICROPY_ENABLE_SCHEDULER                 (1)
+#define MICROPY_SCHEDULER_DEPTH                  (8)
+#define MICROPY_ENABLE_EMERGENCY_EXCEPTION_BUF   (1)
+
 // fatfs configuration used in ffconf.h
 #define MICROPY_FATFS_ENABLE_LFN                 (1)
 #define MICROPY_FATFS_LFN_CODE_PAGE              (437) /* 1=SFN/ANSI 437=LFN/U.S.(OEM) */
@@ -176,6 +181,7 @@ extern const struct _mp_obj_module_t gamepad_module;
 extern const struct _mp_obj_module_t neopixel_write_module;
 extern const struct _mp_obj_module_t usb_hid_module;
 extern const struct _mp_obj_module_t bleio_module;
+extern const struct _mp_obj_module_t timer_module;
 
 #if MICROPY_PY_BLEIO
 #define BLEIO_MODULE { MP_ROM_QSTR(MP_QSTR_bleio), MP_ROM_PTR(&bleio_module) },
@@ -205,6 +211,7 @@ extern const struct _mp_obj_module_t bleio_module;
     { MP_OBJ_NEW_QSTR (MP_QSTR_supervisor      ), (mp_obj_t)&supervisor_module      }, \
     { MP_OBJ_NEW_QSTR (MP_QSTR_gamepad         ), (mp_obj_t)&gamepad_module         }, \
     { MP_OBJ_NEW_QSTR (MP_QSTR_time            ), (mp_obj_t)&time_module            }, \
+    { MP_OBJ_NEW_QSTR (MP_QSTR_timer           ), (mp_obj_t)&timer_module           }, \
     USBHID_MODULE  \
     BLEIO_MODULE
 

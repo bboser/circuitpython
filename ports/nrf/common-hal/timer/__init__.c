@@ -1,0 +1,1 @@
+// No timer module functions.
