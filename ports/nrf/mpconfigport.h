@@ -120,7 +120,7 @@
 #define MICROPY_PY_UZLIB                         (0)
 #define MICROPY_PY_UJSON                         (1)
 #define MICROPY_PY_URE                           (1)
-#define MICROPY_PY_UHEAPQ                        (0)
+#define MICROPY_PY_UHEAPQ                        (1)
 #define MICROPY_PY_UHASHLIB                      (1)
 #define MICROPY_PY_STRUCT                        (0)
 #define MICROPY_PY_FRAMEBUF                      (1)
