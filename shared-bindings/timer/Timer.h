@@ -44,6 +44,6 @@ extern bool common_hal_timer_timer_deinited(timer_timer_obj_t *self);
 extern uint32_t common_hal_timer_timer_get_elapsed_time(timer_timer_obj_t *self);
 
 extern void common_hal_timer_timer_start(timer_timer_obj_t *self);
-extern void common_hal_timer_timer_stop(timer_timer_obj_t *self);
+extern void common_hal_timer_timer_cancel(timer_timer_obj_t *self);
 
 #endif // MICROPY_INCLUDED_SHARED_BINDINGS_TIMER_TIMER_H

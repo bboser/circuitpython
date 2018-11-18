@@ -36,14 +36,13 @@
 STATIC void timer_event_handler(nrf_timer_event_t event_type, void *p_context) {
     if (event_type != NRF_TIMER_EVENT_COMPARE0) return;
     timer_timer_obj_t *timer_obj = (timer_timer_obj_t*)p_context;
-    mp_obj_t callback = timer_obj->callback;
-    if (callback != NULL) {
-        mp_call_function_1(callback, timer_obj);
+    mp_obj_t function = timer_obj->function;
+    if (function != NULL) {
         if (timer_obj->fast) {
-            mp_call_function_1(callback, timer_obj);
+            mp_call_function_1(function, timer_obj);
         } else {
 #if MICROPY_ENABLE_SCHEDULER
-            if (!mp_sched_schedule(callback, timer_obj)) {
+            if (!mp_sched_schedule(function, timer_obj)) {
                 mp_raise_msg(&mp_type_RuntimeError, translate("schedule stack full"));
             }
 #else
@@ -54,7 +53,7 @@ STATIC void timer_event_handler(nrf_timer_event_t event_type, void *p_context) {
 }
 
 void common_hal_timer_timer_construct(timer_timer_obj_t *self,
-                                           uint32_t period, bool one_shot) {
+                                           uint32_t interval, bool one_shot) {
     // Find a free timer instance.
     self->timer_instance = nrf_peripherals_allocate_timer();
     if (self->timer_instance == NULL) {
@@ -66,7 +65,7 @@ void common_hal_timer_timer_construct(timer_timer_obj_t *self,
     // These can store either the value to compare against (to trigger an
     // interrupt or a shortcut) or store a value returned from a
     // capture/compare event.
-    // We use channel 0 for comparing (to trigger the callback and clear
+    // We use channel 0 for comparing (to trigger the function and clear
     // shortcut) and channel 1 for capturing the elapsed time.
 
     const nrfx_timer_config_t config = {
@@ -92,13 +91,13 @@ void common_hal_timer_timer_construct(timer_timer_obj_t *self,
     nrfx_timer_extended_compare(
             self->timer_instance,
             NRF_TIMER_CC_CHANNEL0,
-            period,
+            interval,
             short_mask,
             enable_interrupts);
 }
 
 void common_hal_timer_timer_deinit(timer_timer_obj_t *self) {
-    common_hal_timer_timer_stop(self);
+    common_hal_timer_timer_cancel(self);
     nrf_peripherals_free_timer(self->timer_instance);
     self->timer_instance = NULL;
 }
@@ -108,14 +107,14 @@ bool common_hal_timer_timer_deinited(timer_timer_obj_t *self) {
 }
 
 uint32_t common_hal_timer_timer_get_elapsed_time(timer_timer_obj_t *self) {
-    uint32_t period = nrfx_timer_capture(self->timer_instance, NRF_TIMER_CC_CHANNEL1);
-    return period;
+    uint32_t interval = nrfx_timer_capture(self->timer_instance, NRF_TIMER_CC_CHANNEL1);
+    return interval;
 }
 
 void common_hal_timer_timer_start(timer_timer_obj_t *self) {
     nrfx_timer_enable(self->timer_instance);
 }
 
-void common_hal_timer_timer_stop(timer_timer_obj_t *self) {
+void common_hal_timer_timer_cancel(timer_timer_obj_t *self) {
     nrfx_timer_disable(self->timer_instance);
 }

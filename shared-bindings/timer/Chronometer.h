@@ -29,7 +29,9 @@
 
 typedef struct {
     mp_obj_base_t base;
-    uint64_t start_time;   // elapsed_time is relative to this
+    // -elapsed time when stopped, basis compared to time.monotonic() otherwise
+    int64_t start_time;
+
 } timer_chronometer_obj_t;
 
 extern const mp_obj_type_t timer_chronometer_type;

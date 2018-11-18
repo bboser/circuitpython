@@ -35,8 +35,7 @@
 typedef struct {
     mp_obj_base_t base;
     nrfx_timer_t *timer_instance;
-    // int x;
-    mp_obj_t callback;
+    mp_obj_t function;
     bool fast;
 } timer_timer_obj_t;
 

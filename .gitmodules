@@ -2,6 +2,7 @@
 	path = lib/axtls
 	url = https://github.com/pfalcon/axtls
 	branch = micropython
+	ignore = dirty
 [submodule "lib/libffi"]
 	path = lib/libffi
 	url = https://github.com/atgreen/libffi

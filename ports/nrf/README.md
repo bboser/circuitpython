@@ -55,7 +55,8 @@ Prerequisite steps for building the nrf port:
 To build and flash issue the following command inside the ports/nrf/ folder:
 
 	make BOARD=pca10056
-	make BOARD=pca10056 flash
+    make BOARD=pca10056 flash
+    make V=1 BOARD=pca10059  SD=s140
 
 ## Compile and Flash with Bluetooth Stack
 

@@ -41,21 +41,21 @@ enum {
 
 //| .. currentmodule:: timer
 //|
-//| :class:`Timer` -- Timed code execution via callbacks
+//| :class:`Timer` -- Timed code execution via functions
 //| ====================================================================================
 //|
-//| Timer executes a callback either periodically or after a delay. It can
+//| Timer executes a function function after a delay or periodically. It can
 //| also be used to measure elapsed time with micro-second resolution.
-//| Uses hardware timers.
+//| Uses hardware timers. Loosely follows `threading.Timer` API.
 //|
-//| .. class:: Timer(\*, period=1000000, mode=Timer.MODE_PERIODIC, callback=None, fast=False)
+//| .. class:: Timer(\*, interval=1.0, function=None, mode=Timer.ONESHOT, fast=False)
 //|
 //|   Create timer.
 //|
-//|   :param ~int period: period (or delay for MODE_ONESHOT) in micro-seconds.
-//|   :param ~timer.Timer mode: MODE_PERIODIC (default) or MODE_ONESHOT.
-//|   :param callback: Method called when timer expires.
-//|   :param ~boolean fast: Decreased latency. WARNING: memory allocation not permitted in callback function.
+//|   :param ~float interval: period (or delay for ONESHOT) in seconds. Maximum: 3600.
+//|   :param function: A function that is called when timer expires.
+//|   :param ~timer.Timer mode: ONESHOT (default) or PERIODIC.
+//|   :param ~boolean fast: Decreased latency. WARNING: memory allocation not permitted in function function.
 //|
 //|   For example::
 //|
@@ -66,16 +66,16 @@ enum {
 //|         # ATTENTION: no memory allocation if fast==True. Use with caution.
 //|         pass
 //|
-//|     # create timer that calls `cb` every 5000 micro-seconds
-//|     t = Timer(period=5000, mode=Timer.MODE_PERIODIC, callback=cb)
+//|     # create timer that calls `cb` every 0.5 seconds
+//|     t = Timer(interval=0.5, function=cb, mode=Timer.PERIODIC)
 //|     t.start()
 //|
 STATIC mp_obj_t timer_timer_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *all_args) {
-    enum { ARG_period, ARG_mode, ARG_callback, ARG_fast };
+    enum { ARG_interval, ARG_function, ARG_mode, ARG_fast };
     static const mp_arg_t allowed_args[] = {
-        { MP_QSTR_period,   MP_ARG_KW_ONLY | MP_ARG_INT,  {.u_int  = 1000000} }, // 1 second
-        { MP_QSTR_mode,     MP_ARG_KW_ONLY | MP_ARG_INT,  {.u_int  = TIMER_MODE_PERIODIC} },
-        { MP_QSTR_callback, MP_ARG_KW_ONLY | MP_ARG_OBJ,  {.u_obj  = mp_const_none} },
+        { MP_QSTR_interval, MP_ARG_KW_ONLY | MP_ARG_OBJ,  {.u_obj  = mp_const_none} },
+        { MP_QSTR_function, MP_ARG_KW_ONLY | MP_ARG_OBJ,  {.u_obj  = mp_const_none} },
+        { MP_QSTR_mode,     MP_ARG_KW_ONLY | MP_ARG_INT,  {.u_int  = TIMER_MODE_ONESHOT} },
         { MP_QSTR_fast,     MP_ARG_KW_ONLY | MP_ARG_BOOL, {.u_bool = false} },
     };
     mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
@@ -86,16 +86,23 @@ STATIC mp_obj_t timer_timer_make_new(const mp_obj_type_t *type, size_t n_args, s
     self->base.type = &timer_timer_type;
     self->fast = args[ARG_fast].u_bool;
 
-    // callback
-    if (MP_OBJ_IS_FUN(args[ARG_callback].u_obj)) {
-        self->callback = args[ARG_callback].u_obj;
-    } else if (args[ARG_callback].u_obj == mp_const_none) {
-        self->callback = NULL;
+    // callback function
+    if (MP_OBJ_IS_FUN(args[ARG_function].u_obj)) {
+        self->function = args[ARG_function].u_obj;
+    } else if (args[ARG_function].u_obj == mp_const_none) {
+        self->function = NULL;
     } else {
-        mp_raise_ValueError(translate("callback must be a function"));
+        mp_raise_ValueError(translate("function must be a function"));
     }
 
-    common_hal_timer_timer_construct(self, args[ARG_period].u_int,
+    // convert interval to 32-bits
+    float interval = 1.0;
+    mp_obj_t interval_obj = args[ARG_interval].u_obj;
+    if (interval_obj != mp_const_none) interval = mp_obj_get_float(interval_obj);
+    if (interval <= 0) mp_raise_ValueError(translate("interval must be positive"));
+    if (interval > 4294.967) mp_raise_ValueError(translate("interval must be <= 3600"));
+
+    common_hal_timer_timer_construct(self, (uint32_t)(interval*1000000),
                                    args[ARG_mode].u_int == TIMER_MODE_ONESHOT);
     return (mp_obj_t)self;
 }
@@ -124,7 +131,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(timer_timer___exit___obj, 4, 4, timer
 //|
 STATIC mp_obj_t timer_timer_deinit(mp_obj_t self_in) {
     timer_timer_obj_t *self = MP_OBJ_TO_PTR(self_in);
-    self->callback = NULL;
+    self->function = NULL;
     common_hal_timer_timer_deinit(self);
     return mp_const_none;
 }
@@ -132,12 +139,12 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(timer_timer_deinit_obj, timer_timer_deinit);
 
 //|   .. attribute:: elapsed_time
 //|
-//|     Elapsed time in micro-seconds (int).
+//|     Elapsed time in seconds (float). Micro-second resolution.
 //|
 STATIC mp_obj_t timer_timer_obj_get_elapsed_time(mp_obj_t self_in) {
     timer_timer_obj_t *self = MP_OBJ_TO_PTR(self_in);
     raise_error_if_deinited(common_hal_timer_timer_deinited(self));
-    return MP_OBJ_NEW_SMALL_INT(common_hal_timer_timer_get_elapsed_time(self));
+    return mp_obj_new_float(common_hal_timer_timer_get_elapsed_time(self)/1000000.0);
 }
 MP_DEFINE_CONST_FUN_OBJ_1(timer_timer_get_elapsed_time_obj, timer_timer_obj_get_elapsed_time);
 
@@ -153,17 +160,17 @@ STATIC mp_obj_t timer_timer_obj_start(mp_obj_t self_in) {
 }
 MP_DEFINE_CONST_FUN_OBJ_1(timer_timer_start_obj, timer_timer_obj_start);
 
-//|   .. method:: stop
+//|   .. method:: cancel
 //|
-//|     Stop timer.
+//|     Cancel timer.
 //|
-STATIC mp_obj_t timer_timer_obj_stop(mp_obj_t self_in) {
+STATIC mp_obj_t timer_timer_obj_cancel(mp_obj_t self_in) {
     timer_timer_obj_t *self = MP_OBJ_TO_PTR(self_in);
     raise_error_if_deinited(common_hal_timer_timer_deinited(self));
-    common_hal_timer_timer_stop(self);
+    common_hal_timer_timer_cancel(self);
     return mp_const_none;
 }
-MP_DEFINE_CONST_FUN_OBJ_1(timer_timer_stop_obj, timer_timer_obj_stop);
+MP_DEFINE_CONST_FUN_OBJ_1(timer_timer_cancel_obj, timer_timer_obj_cancel);
 
 const mp_obj_property_t timer_timer_elapsed_time_obj = {
     .base.type = &mp_type_property,
@@ -177,7 +184,7 @@ STATIC const mp_rom_map_elem_t timer_timer_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR___enter__), MP_ROM_PTR(&default___enter___obj) },
     { MP_ROM_QSTR(MP_QSTR___exit__), MP_ROM_PTR(&timer_timer___exit___obj) },
     { MP_ROM_QSTR(MP_QSTR_start),    MP_ROM_PTR(&timer_timer_start_obj) },
-    { MP_ROM_QSTR(MP_QSTR_stop),     MP_ROM_PTR(&timer_timer_stop_obj) },
+    { MP_ROM_QSTR(MP_QSTR_cancel),     MP_ROM_PTR(&timer_timer_cancel_obj) },
     // Properties
     { MP_ROM_QSTR(MP_QSTR_elapsed_time), MP_ROM_PTR(&timer_timer_elapsed_time_obj) },
     // Constants

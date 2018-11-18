@@ -60,6 +60,8 @@ void timers_reset(void) {
         nrfx_timer_uninit(&nrfx_timers[i]);
         nrfx_timer_allocated[i] = false;
     }
+    // Used by SoftDevice. Could check if it's enabled.
+    nrfx_timer_allocated[0] = true;
 }
 
 // Returns a free nrfx_timer instance, and marks it as allocated.

@@ -35,6 +35,7 @@
 
 extern uint64_t common_hal_time_monotonic(void);
 
+
 //| .. currentmodule:: timer
 //|
 //| :class:`Chronometer` -- Measure elapsed time
@@ -52,6 +53,10 @@ extern uint64_t common_hal_time_monotonic(void);
 //|   of `Chronometer` is relative to the period measured, not the time
 //|   when the microcontroller was started (i.e. it does not suffer from
 //|   decreasing accuracy for long power-on times.).
+//|
+//|   Chronometer behave like stop watches: the clock starts when instantiated,
+//|   `stop()`, `resume()`, `reset()` do what the name says. The elapsed time is
+//|   is available as attribute `elapsed_time` (as a float, in seconds).
 //|
 //|   For example::
 //|
@@ -97,7 +102,8 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(timer_chronometer_deinit_obj, timer_chronometer
 //|
 STATIC mp_obj_t timer_chronometer_obj___exit__(size_t n_args, const mp_obj_t *args) {
     (void)n_args;
-    return timer_chronometer_deinit(args[0]);
+    timer_chronometer_deinit(args[0]);
+    return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(timer_chronometer___exit___obj, 4, 4, timer_chronometer_obj___exit__);
 
@@ -108,15 +114,49 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(timer_chronometer___exit___obj, 4, 4,
 //|
 STATIC mp_obj_t timer_chronometer_obj_get_elapsed_time(mp_obj_t self_in) {
     timer_chronometer_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    // helper to compute elapsed time
     raise_error_if_deinited(self->start_time == 0);
-    float td = common_hal_time_monotonic() - self->start_time;
-    return mp_obj_new_float(td/1000.0);
+    float time_delta;
+    if (self->start_time > 0) {
+        // running
+        time_delta = (int64_t)common_hal_time_monotonic() - self->start_time;
+    } else {
+        // stopped. start_time is elapsed time so far, negative.
+        time_delta = -self->start_time;
+    }
+    return mp_obj_new_float(time_delta/1000.0);
 }
 MP_DEFINE_CONST_FUN_OBJ_1(timer_chronometer_get_elapsed_time_obj, timer_chronometer_obj_get_elapsed_time);
 
+//|   .. method:: stop
+//|
+//|     Stop clock.
+//|
+STATIC mp_obj_t timer_chronometer_obj_stop(mp_obj_t self_in) {
+    timer_chronometer_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    raise_error_if_deinited(self->start_time == 0);
+    if (self->start_time > 0)
+        self->start_time = self->start_time - (int64_t)common_hal_time_monotonic();
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_1(timer_chronometer_stop_obj, timer_chronometer_obj_stop);
+
+//|   .. method:: resume
+//|
+//|     Resume clock.
+//|
+STATIC mp_obj_t timer_chronometer_obj_resume(mp_obj_t self_in) {
+    timer_chronometer_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    raise_error_if_deinited(self->start_time == 0);
+    if (self->start_time < 0)
+        self->start_time = self->start_time + common_hal_time_monotonic();
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_1(timer_chronometer_resume_obj, timer_chronometer_obj_resume);
+
 //|   .. method:: reset
 //|
-//|     Reset chronometer to restart measuring now.
+//|     Reset chronometer to restart measuring from present time.
 //|
 STATIC mp_obj_t timer_chronometer_obj_reset(mp_obj_t self_in) {
     timer_chronometer_obj_t *self = MP_OBJ_TO_PTR(self_in);
@@ -137,6 +177,8 @@ STATIC const mp_rom_map_elem_t timer_chronometer_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_deinit), MP_ROM_PTR(&timer_chronometer_deinit_obj) },
     { MP_ROM_QSTR(MP_QSTR___enter__), MP_ROM_PTR(&default___enter___obj) },
     { MP_ROM_QSTR(MP_QSTR___exit__), MP_ROM_PTR(&timer_chronometer___exit___obj) },
+    { MP_ROM_QSTR(MP_QSTR_stop), MP_ROM_PTR(&timer_chronometer_stop_obj) },
+    { MP_ROM_QSTR(MP_QSTR_resume), MP_ROM_PTR(&timer_chronometer_resume_obj) },
     { MP_ROM_QSTR(MP_QSTR_reset), MP_ROM_PTR(&timer_chronometer_reset_obj) },
     // Properties
     { MP_ROM_QSTR(MP_QSTR_elapsed_time), MP_ROM_PTR(&timer_chronometer_elapsed_time_obj) },
