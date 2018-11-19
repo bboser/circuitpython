@@ -107,6 +107,7 @@
 #define MICROPY_PY_SYS_MAXSIZE                   (1)
 #define MICROPY_PY_SYS_STDFILES                  (1)
 #define MICROPY_PY_SYS_STDIO_BUFFER              (1)
+#define MICROPY_PY_COLLECTIONS_DEQUE             (1)
 #define MICROPY_PY_COLLECTIONS_ORDEREDDICT       (0)
 #define MICROPY_PY_MATH_SPECIAL_FUNCTIONS        (0)
 #define MICROPY_PY_CMATH                         (0)
