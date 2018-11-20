@@ -216,6 +216,7 @@ SRC_SHARED_BINDINGS = \
 	bitbangio/SPI.c \
 	bitbangio/OneWire.c \
 	random/__init__.c \
+	utime/__init__.c \
 	timer/Chronometer.c \
 
 # USB source files for nrf52840
