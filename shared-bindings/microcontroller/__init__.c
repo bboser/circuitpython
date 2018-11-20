@@ -39,7 +39,6 @@
 #include "shared-bindings/microcontroller/Pin.h"
 #include "shared-bindings/microcontroller/Processor.h"
 
-#include "py/runtime.h"
 #include "supervisor/shared/translate.h"
 
 //| :mod:`microcontroller` --- Pin references and cpu functionality
@@ -132,34 +131,34 @@ STATIC mp_obj_t mcu_on_next_reset(mp_obj_t run_mode_obj) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(mcu_on_next_reset_obj, mcu_on_next_reset);
 
-//| .. method:: deepsleep()
+//| .. method:: deepsleep(timeout)
 //|
-//|   Power saving mode: halts CPU, resumes execution (statement after this
-//|   call) on interrupt. Also stops system timer (time.monotonic won't update).
+//|   Power saving mode: halts CPU, resumes execution after this statement
+//|   either when an interrupt is serviced (e.g. timer, gpio pin) or the
+//|   timeout expires.
 //|
-//|   Interrupt sources include timers, gpio events, usb events, ...
-//|
-//|   Note: CPU current drops to ~ 3uA (assuming no I/O activity such as PWM).
+//|   Note 1: CPU current drops to ~ 3uA (assuming no I/O activity such as PWM).
 //|   The nRF52840 offers even lower power modes (without RAM retention, etc).
 //|
-//|   Example:
-//|   deepsleep for 5 seconds, wakeup by timer (assuming no other earlier events).
+//|   Note 2: time.monotonic() looses precision (few ms) during deepsleep.
 //|
-//|       from timer import Timer
+//|   :param ~float timeout: The maximum duration of deepsleep, in seconds.
+//|   :return: actual time slept
+//|   :rtype: float
+//|   Interrupt sources include timers, gpio events, usb events, ...
+//|
+//|   Example:  deepsleep for up to 5 seconds.
+//|
 //|       from microcontroller import deepsleep
 //|
-//|       t = Timer(period=int(5*1e6), mode=Timer.ONESHOT)
-//|       t.start()
-//|       deepsleep()   # reduced cpu current consumption
-//|       # execution resumes after 5 seconds (or an earlier interrupt)
+//|       actual = deepsleep(5.0)   # reduced cpu current consumption
+//|       print("slept for", actual, "seconds")
 //|
-STATIC mp_obj_t deepsleep(void) {
-    __SEV();
-    __WFE();
-    __WFE();
-    return mp_const_none;
+STATIC mp_obj_t deepsleep(mp_obj_t timeout_o) {
+    float timeout = mp_obj_get_float(timeout_o);
+    return mp_obj_new_float(common_hal_mcu_deepsleep(timeout));
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_0(deepsleep_obj, deepsleep);
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(deepsleep_obj, deepsleep);
 
 //| .. method:: reset()
 //|

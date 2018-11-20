@@ -35,6 +35,8 @@
 
 #include "shared-bindings/microcontroller/RunMode.h"
 
+extern float common_hal_mcu_deepsleep(float timeout);
+
 extern void common_hal_mcu_delay_us(uint32_t);
 
 extern void common_hal_mcu_disable_interrupts(void);

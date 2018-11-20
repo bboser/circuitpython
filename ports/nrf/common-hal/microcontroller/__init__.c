@@ -31,8 +31,73 @@
 #include "shared-bindings/microcontroller/Pin.h"
 #include "shared-bindings/microcontroller/Processor.h"
 
+#include "py/mperrno.h"
+#include "py/runtime.h"
+#include "supervisor/shared/translate.h"
 #include "supervisor/filesystem.h"
+
+#include "nrfx.h"
 #include "nrfx_glue.h"
+#include "nrf_clock.h"
+#include "nrfx_rtc.h"
+#include "tick.h"
+
+
+// Count every 1/1024 seconds (closest to 1ms)
+#define RTC_FREQUENCY (1024UL)
+
+// RTC 0 is used by the SoftDevice
+// RTC 1 is reserved for clock
+// RTC 2 is used by deepsleep
+STATIC const nrfx_rtc_t mcu_deepsleep_rtc = NRFX_RTC_INSTANCE(2);
+
+STATIC const nrfx_rtc_config_t mcu_deepsleep_config = {
+    .prescaler    = RTC_FREQ_TO_PRESCALER(RTC_FREQUENCY),
+    .reliable     = 0,
+    .tick_latency = 0, // ignored when reliable == 0
+    .interrupt_priority = 6,
+};
+
+STATIC void rtc_interrupt_handler(nrfx_rtc_int_type_t int_type);
+
+STATIC void rtc_interrupt_handler(nrfx_rtc_int_type_t int_type) {
+    nrfx_rtc_cc_disable(&mcu_deepsleep_rtc, 0);
+}
+
+float common_hal_mcu_deepsleep(float timeout_f) {
+    if (timeout_f < 0) mp_raise_ValueError(translate("timout must be positive"));
+    if (timeout_f >= 16000) mp_raise_ValueError(translate("timout must be < 16000"));
+    uint32_t timeout_i = (uint32_t)(1024*timeout_f);
+
+    // Start the low-frequency clock (if it hasn't been started already)
+    if (!nrf_clock_lf_is_running()) {
+        nrf_clock_task_trigger(NRF_CLOCK_TASK_LFCLKSTART);
+    }
+
+    // Make sure RTC uninitialized.
+    nrfx_rtc_uninit(&mcu_deepsleep_rtc);
+    nrfx_rtc_counter_clear(&mcu_deepsleep_rtc);
+
+    // Initialize and start.
+    nrfx_rtc_init(&mcu_deepsleep_rtc, &mcu_deepsleep_config, rtc_interrupt_handler);
+    nrfx_rtc_cc_set(&mcu_deepsleep_rtc, 0 /*channel*/, timeout_i, true /*enable irq*/);
+    nrfx_rtc_enable(&mcu_deepsleep_rtc);
+
+    // Enter deepsleep
+    __SEV();
+    __WFE();
+    __WFE();
+
+    // Resume after deepsleep
+    uint32_t counter = nrfx_rtc_counter_get(&mcu_deepsleep_rtc);
+    nrfx_rtc_disable(&mcu_deepsleep_rtc);
+    float slept_sec = counter / 1024.0;
+
+    // Ajust time.monotonic()
+    ticks_ms += (uint64_t)(1000*slept_sec);
+
+    return slept_sec;
+}
 
 // This routine should work even when interrupts are disabled. Used by OneWire
 // for precise timing.
@@ -41,6 +106,7 @@ void common_hal_mcu_delay_us(uint32_t delay) {
 }
 
 void common_hal_mcu_disable_interrupts() {
+    // Never do this if using SoftDevice!!!
 }
 
 void common_hal_mcu_enable_interrupts() {
