@@ -29,6 +29,7 @@
 
 #include "common-hal/microcontroller/Pin.h"
 #include "common-hal/digitalio/DigitalInOut.h"
+#include "shared-bindings/digitalio/Polarity.h"
 #include "shared-bindings/digitalio/Direction.h"
 #include "shared-bindings/digitalio/DriveMode.h"
 #include "shared-bindings/digitalio/Pull.h"
@@ -41,6 +42,7 @@ typedef enum {
 } digitalinout_result_t;
 
 digitalinout_result_t common_hal_digitalio_digitalinout_construct(digitalio_digitalinout_obj_t* self, const mcu_pin_obj_t* pin);
+void common_hal_digitalio_digitalinout_irq(digitalio_digitalinout_obj_t* self, mp_obj_t handler, int trigger, bool fast);
 void common_hal_digitalio_digitalinout_deinit(digitalio_digitalinout_obj_t* self);
 bool common_hal_digitalio_digitalinout_deinited(digitalio_digitalinout_obj_t* self);
 void common_hal_digitalio_digitalinout_switch_to_input(digitalio_digitalinout_obj_t* self, digitalio_pull_t pull);

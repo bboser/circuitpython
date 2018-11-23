@@ -228,8 +228,15 @@ extern const struct _mp_obj_module_t timer_module;
 
 #define MP_STATE_PORT MP_STATE_VM
 
+#if defined(NRF52840_XXAA)
+#define NUM_OF_PINS 48
+#else
+#define NUM_OF_PINS 32
+#endif
+
 #define MICROPY_PORT_ROOT_POINTERS \
     const char *readline_hist[8]; \
+    mp_obj_t pin_irq_handlers[NUM_OF_PINS]; \
     mp_obj_t gamepad_singleton; \
 
 // We need to provide a declaration/definition of alloca()

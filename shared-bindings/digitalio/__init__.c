@@ -94,6 +94,7 @@ STATIC const mp_rom_map_elem_t digitalio_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_DigitalInOut),  MP_ROM_PTR(&digitalio_digitalinout_type) },
 
     // Enum-like Classes.
+    { MP_ROM_QSTR(MP_QSTR_Polarity),           MP_ROM_PTR(&digitalio_polarity_type) },
     { MP_ROM_QSTR(MP_QSTR_Direction),          MP_ROM_PTR(&digitalio_direction_type) },
     { MP_ROM_QSTR(MP_QSTR_DriveMode),          MP_ROM_PTR(&digitalio_drive_mode_type) },
     { MP_ROM_QSTR(MP_QSTR_Pull),               MP_ROM_PTR(&digitalio_pull_type) },
