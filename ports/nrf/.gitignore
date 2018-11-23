@@ -1,8 +1,8 @@
 # Nordic files
 #####################
 bluetooth/s1*/
+nordic_sdk/*
 
 # Build files
 #####################
 build-*/
-
