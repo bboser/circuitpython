@@ -47,9 +47,9 @@
 //|
 //|     Enum-like class to define which Polarity triggering the irq handler of a pin.
 //|
-//|     .. data:: HI2LO
-//|     .. data:: LO2HI
-//|     .. data:: BOTH
+//|     .. data:: FALLING_EDGE
+//|     .. data:: RISING_EDGE
+//|     .. data:: RISING_OR_FALLING_EDGE
 //|
 const mp_obj_type_t digitalio_polarity_type;
 
