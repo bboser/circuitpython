@@ -29,15 +29,85 @@
 #include "supervisor/shared/translate.h"
 
 #include "nrf_gpio.h"
+#include "nrfx_gpiote.h"
 
 digitalinout_result_t common_hal_digitalio_digitalinout_construct(
         digitalio_digitalinout_obj_t *self, const mcu_pin_obj_t *pin) {
     claim_pin(pin);
     self->pin = pin;
-
     nrf_gpio_cfg_input(pin->number, NRF_GPIO_PIN_NOPULL);
 
     return DIGITALINOUT_OK;
+}
+
+// REMOVE THIS
+// STATIC mp_obj_t pin_handler;
+
+// The reason that the saved pointer needs to go into MP_STATE_PORT is so that
+// the garbage collector won't collect the callback function.
+// https://forum.micropython.org/viewtopic.php?t=4379
+
+STATIC void common_hal_fast_irq_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
+    mp_obj_t pin_handler = MP_STATE_PORT(pin_irq_handlers)[pin];
+    bool value = (nrf_gpio_pin_dir_get(pin) == NRF_GPIO_PIN_DIR_INPUT)
+        ? nrf_gpio_pin_read(pin)
+        : nrf_gpio_pin_out_read(pin);
+    mp_call_function_1(pin_handler, mp_obj_new_bool(value));
+}
+
+STATIC void common_hal_port_irq_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
+    mp_obj_t pin_handler = MP_STATE_PORT(pin_irq_handlers)[pin];
+    bool value = (nrf_gpio_pin_dir_get(pin) == NRF_GPIO_PIN_DIR_INPUT)
+        ? nrf_gpio_pin_read(pin)
+        : nrf_gpio_pin_out_read(pin);
+#if MICROPY_ENABLE_SCHEDULER
+    if (!mp_sched_schedule(pin_handler, mp_obj_new_bool(value))) {
+        mp_raise_msg(&mp_type_RuntimeError, translate("schedule stack full"));
+    }
+#else
+    mp_raise_ValueError(translate("scheduler not enabled, use fast interrupt"));
+#endif
+}
+
+// BUG: fast=False crashes VM
+// https://devzone.nordicsemi.com/f/nordic-q-a/18052/gpiote-handler-module-or-gpiote-driver-for-port-interrupt/69597#69597
+void common_hal_digitalio_digitalinout_irq(digitalio_digitalinout_obj_t *self, mp_obj_t handler, int trigger, bool fast) {
+    nrfx_gpiote_pin_t pin = self->pin->number;
+
+    if (nrf_gpio_pin_dir_get(pin) == NRF_GPIO_PIN_DIR_OUTPUT) {
+        mp_raise_AttributeError(translate("Cannot attach handler to output pin"));
+    }
+
+    // initialize gpiote
+    if (!nrfx_gpiote_is_init()) nrfx_gpiote_init();
+
+    // configure pin, defalt is
+    nrfx_gpiote_in_config_t config = NRFX_GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);  // fast);
+
+    // trigger polarity
+    if (trigger == 1) config.sense = NRF_GPIOTE_POLARITY_LOTOHI;
+    if (trigger == 2) config.sense = NRF_GPIOTE_POLARITY_HITOLO;
+
+    // match pull to current setting
+    // Changes pin to be a relative pin number in port.
+    uint32_t pin_ = pin;
+    NRF_GPIO_Type *reg = nrf_gpio_pin_port_decode(&pin_);
+    config.pull = ((reg->PIN_CNF[pin_] & GPIO_PIN_CNF_PULL_Msk) >> GPIO_PIN_CNF_PULL_Pos);
+
+    // set interrupt handler
+    nrfx_gpiote_evt_handler_t irq_handler = fast ? common_hal_fast_irq_handler : common_hal_port_irq_handler;
+    nrfx_err_t err_code = nrfx_gpiote_in_init(pin, &config, irq_handler);
+    if (err_code == NRFX_ERROR_INVALID_STATE) {
+        nrfx_gpiote_in_uninit(pin);
+        err_code = nrfx_gpiote_in_init(pin, &config, irq_handler);
+    }
+    if (err_code == NRFX_ERROR_NO_MEM) mp_raise_RuntimeError(translate("all irq channels in use"));
+    if (err_code != NRFX_SUCCESS) mp_raise_RuntimeError(translate("failed to init GPIOTE for pin"));
+    // enable interrupts
+    nrfx_gpiote_in_event_enable(pin, true);
+
+    // success, assign handler
+    MP_STATE_PORT(pin_irq_handlers)[pin] = handler;
 }
 
 bool common_hal_digitalio_digitalinout_deinited(digitalio_digitalinout_obj_t *self) {
@@ -48,9 +118,12 @@ void common_hal_digitalio_digitalinout_deinit(digitalio_digitalinout_obj_t *self
     if (common_hal_digitalio_digitalinout_deinited(self)) {
         return;
     }
-    nrf_gpio_cfg_default(self->pin->number);
+    int pn = self->pin->number;
+    nrfx_gpiote_in_uninit(pn);
+    nrf_gpio_cfg_default(pn);
+    reset_pin_number(pn);
+    MP_STATE_PORT(pin_irq_handlers)[pn] = NULL;
 
-    reset_pin_number(self->pin->number);
     self->pin = mp_const_none;
 }
 

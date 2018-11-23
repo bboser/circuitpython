@@ -57,7 +57,7 @@ void common_hal_timer_timer_construct(timer_timer_obj_t *self,
     // Find a free timer instance.
     self->timer_instance = nrf_peripherals_allocate_timer();
     if (self->timer_instance == NULL) {
-        mp_raise_ValueError(translate("All timers are in use"));
+        mp_raise_RuntimeError(translate("All timers are in use"));
     }
 
     // Timer peripheral usage:

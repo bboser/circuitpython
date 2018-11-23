@@ -88,6 +88,7 @@ LIBS += -L $(dir $(LIBGCC_FILE_NAME)) -lgcc
 
 SRC_NRFX = $(addprefix nrfx/,\
 	drivers/src/nrfx_power.c \
+	drivers/src/nrfx_gpiote.c \
 	drivers/src/nrfx_spim.c \
 	drivers/src/nrfx_timer.c \
 	drivers/src/nrfx_twim.c \
@@ -171,6 +172,7 @@ endif
 # shared-bindings to make it clear what the contents of the modules are.
 SRC_BINDINGS_ENUMS = \
 	busio/OneWire.c \
+	digitalio/Polarity.c \
 	digitalio/Direction.c \
 	digitalio/DriveMode.c \
 	digitalio/Pull.c \

@@ -26,6 +26,12 @@
 #endif
 
 #define NRFX_GPIOTE_ENABLED 1
+
+// max number "slow" PORT events
+// BUGS:
+//   1) crash if no "fast" irq is registered first
+//   2) does now work with more than 1 pin
+//      callback never called when > 1 irq is registered
 #define NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 1
 #if NRF51
   #define NRFX_GPIOTE_CONFIG_IRQ_PRIORITY 3

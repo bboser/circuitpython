@@ -76,6 +76,51 @@ STATIC mp_obj_t digitalio_digitalinout_make_new(const mp_obj_type_t *type,
     return (mp_obj_t)self;
 }
 
+//|   .. method:: irq(handler, trigger=Polarity.RISING_OR_FALLING_EDGE, fast=False)
+//|
+//|      Configure irq handler for this pin.
+//|
+//|     :param Handler handler: interrupt handler
+//|     :param Trigger trigger: DigitalInOut.Polarity
+//|     :param Wake wake: wake processor from deepsleep
+//|     :param Fast fast: low latency (heap allocation not permitted!)
+//|
+//|   Note: always uses fast, high power dissipation GPIOTE EVENTS
+//|         (PORT EVENTS crash VM).
+//|
+STATIC mp_obj_t digitalio_digitalinout_obj_irq(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
+	enum {ARG_handler, ARG_trigger, ARG_fast};
+    static const mp_arg_t allowed_args[] = {
+        { MP_QSTR_handler, MP_ARG_OBJ | MP_ARG_REQUIRED,  {.u_obj = mp_const_none} },
+        { MP_QSTR_trigger, MP_ARG_OBJ,  {.u_obj = mp_const_none} },
+        { MP_QSTR_fast,    MP_ARG_BOOL, {.u_bool = false} },
+    };
+    digitalio_digitalinout_obj_t *self = MP_OBJ_TO_PTR(pos_args[0]);
+    raise_error_if_deinited(common_hal_digitalio_digitalinout_deinited(self));
+    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+    mp_arg_parse_all(n_args - 1, pos_args + 1, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+
+    // trigger polarity
+    int trigger = 0;
+    if (args[ARG_trigger].u_obj == &digitalio_polarity_hi2lo_obj) {
+        trigger = 2;
+    } else if (args[ARG_trigger].u_obj == &digitalio_polarity_lo2hi_obj) {
+        trigger = 1;
+    }
+
+    // handler function
+    mp_obj_t handler = NULL;
+    if (MP_OBJ_IS_FUN(args[ARG_handler].u_obj)) {
+        handler = args[ARG_handler].u_obj;
+    } else {
+        mp_raise_ValueError(translate("handler must be a function"));
+    }
+
+    common_hal_digitalio_digitalinout_irq(self, handler, trigger, args[ARG_fast].u_bool);
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_KW(digitalio_digitalinout_irq_obj, 1, digitalio_digitalinout_obj_irq);
+
 //|   .. method:: deinit()
 //|
 //|      Turn off the DigitalInOut and release the pin for other use.
@@ -353,6 +398,7 @@ const mp_obj_property_t digitalio_digitalio_pull_obj = {
 
 STATIC const mp_rom_map_elem_t digitalio_digitalinout_locals_dict_table[] = {
     // instance methods
+    { MP_ROM_QSTR(MP_QSTR_irq),                MP_ROM_PTR(&digitalio_digitalinout_irq_obj) },
     { MP_ROM_QSTR(MP_QSTR_deinit),             MP_ROM_PTR(&digitalio_digitalinout_deinit_obj) },
     { MP_ROM_QSTR(MP_QSTR___enter__),          MP_ROM_PTR(&default___enter___obj) },
     { MP_ROM_QSTR(MP_QSTR___exit__),           MP_ROM_PTR(&digitalio_digitalinout_obj___exit___obj) },
