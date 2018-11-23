@@ -186,6 +186,7 @@ extern const struct _mp_obj_module_t bleio_module;
 extern const struct _mp_obj_module_t time_module;
 extern const struct _mp_obj_module_t utime_module;
 extern const struct _mp_obj_module_t timer_module;
+extern const struct _mp_obj_module_t atomic_module;
 
 #if MICROPY_PY_BLEIO
 #define BLEIO_MODULE { MP_ROM_QSTR(MP_QSTR_bleio), MP_ROM_PTR(&bleio_module) },
@@ -217,6 +218,7 @@ extern const struct _mp_obj_module_t timer_module;
     { MP_OBJ_NEW_QSTR (MP_QSTR_time            ), (mp_obj_t)&time_module            }, \
     { MP_OBJ_NEW_QSTR (MP_QSTR_utime           ), (mp_obj_t)&utime_module            }, \
     { MP_OBJ_NEW_QSTR (MP_QSTR_timer           ), (mp_obj_t)&timer_module           }, \
+    { MP_OBJ_NEW_QSTR (MP_QSTR_atomic          ), (mp_obj_t)&atomic_module           }, \
     USBHID_MODULE  \
     BLEIO_MODULE
 
