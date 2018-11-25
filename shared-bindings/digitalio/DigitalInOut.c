@@ -109,12 +109,12 @@ STATIC mp_obj_t digitalio_digitalinout_obj_irq(size_t n_args, const mp_obj_t *po
     }
 
     // handler function
-    mp_obj_t handler = NULL;
-    if (MP_OBJ_IS_FUN(args[ARG_handler].u_obj)) {
-        handler = args[ARG_handler].u_obj;
-    } else {
-        mp_raise_ValueError(translate("handler must be a function"));
-    }
+    mp_obj_t handler = args[ARG_handler].u_obj;
+    if (handler == mp_const_none) {
+        handler = NULL;
+    } /*else if (!MP_OBJ_IS_FUN(handler) && !MP_OBJ_IS_TYPE(handler, &mp_type_bound_meth)) {
+        mp_raise_ValueError(translate("handler must be a function or bound method"));
+    }*/
 
     common_hal_digitalio_digitalinout_irq(self, handler, trigger, args[ARG_fast].u_bool);
     return mp_const_none;

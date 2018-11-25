@@ -78,6 +78,7 @@
 [submodule "ports/nrf/nrfx"]
 	path = ports/nrf/nrfx
 	url = https://github.com/adafruit/nrfx.git
+	ignore = dirty
 [submodule "lib/tinyusb"]
 	path = lib/tinyusb
 	url = https://github.com/hathach/tinyusb.git
