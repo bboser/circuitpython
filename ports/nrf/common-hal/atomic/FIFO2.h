@@ -1,9 +1,9 @@
 /*
- * This file is part of the Micro Python project, http://micropython.org/
+ * This file is part of the MicroPython project, http://micropython.org/
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Glenn Ruben Bakke
+ * Copyright (c) 2016 Scott Shawcroft
  * Copyright (c) 2018 Bernhard Boser
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,24 +25,17 @@
  * THE SOFTWARE.
  */
 
-#ifndef MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO_H
-#define MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO_H
+#ifndef MICROPY_INCLUDED_NRF_COMMON_HAL_ATOMIC_FIFO2_H
+#define MICROPY_INCLUDED_NRF_COMMON_HAL_ATOMIC_FIFO2_H
 
-#include "common-hal/atomic/FIFO.h"
 
-// Type object used in Python. Should be shared between ports.
-extern const mp_obj_type_t atomic_fifo_type;
+#include "nrf_atfifo/nrf_atfifo.h"
 
-// Initializes the hardware peripheral.
-extern void common_hal_atomic_fifo_construct(atomic_fifo_obj_t *self, mp_int_t size);
+#include "py/obj.h"
 
-// Add item to the end of the fifo. Returns false if fifo is full.
-extern bool common_hal_atomic_fifo_put(atomic_fifo_obj_t *self, mp_obj_t item);
+typedef struct {
+    mp_obj_base_t base;
+    nrf_atfifo_t fifo2_instance;
+} atomic_fifo2_obj_t;
 
-// Remove oldest entry in fifo. Returns item or raises IndexError if fifo is empty.
-extern mp_obj_t common_hal_atomic_fifo_get(atomic_fifo_obj_t *self);
-
-// Returns number of items presently stored in fifo.
-extern int32_t common_hal_atomic_fifo_len(atomic_fifo_obj_t *self);
-
-#endif // MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO_H
+#endif // MICROPY_INCLUDED_NRF_COMMON_HAL_ATOMIC_FIFO2_H

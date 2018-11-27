@@ -43,6 +43,8 @@
 #include "shared-bindings/util.h"
 #include "supervisor/shared/translate.h"
 
+#define MP_OBJ_IS_METH(o) (MP_OBJ_IS_OBJ(o) && (((mp_obj_base_t*)MP_OBJ_TO_PTR(o))->type->name == MP_QSTR_bound_method))
+
 //| .. currentmodule:: digitalio
 //|
 //| :class:`DigitalInOut` -- digital input and output
@@ -112,9 +114,9 @@ STATIC mp_obj_t digitalio_digitalinout_obj_irq(size_t n_args, const mp_obj_t *po
     mp_obj_t handler = args[ARG_handler].u_obj;
     if (handler == mp_const_none) {
         handler = NULL;
-    } /*else if (!MP_OBJ_IS_FUN(handler) && !MP_OBJ_IS_TYPE(handler, &mp_type_bound_meth)) {
+    } else if (!MP_OBJ_IS_FUN(handler) && !MP_OBJ_IS_METH(handler)) {
         mp_raise_ValueError(translate("handler must be a function or bound method"));
-    }*/
+    }
 
     common_hal_digitalio_digitalinout_irq(self, handler, trigger, args[ARG_fast].u_bool);
     return mp_const_none;

@@ -156,6 +156,7 @@ SRC_COMMON_HAL += \
 	timer/Timer.c \
 	timer/__init__.c \
 	atomic/FIFO.c \
+	atomic/FIFO2.c \
 	atomic/__init__.c \
 
 ifneq ($(SD), )

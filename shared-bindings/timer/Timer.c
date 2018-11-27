@@ -33,6 +33,8 @@
 #include "shared-bindings/timer/Timer.h"
 #include "shared-bindings/util.h"
 
+#define MP_OBJ_IS_METH(o) (MP_OBJ_IS_OBJ(o) && (((mp_obj_base_t*)MP_OBJ_TO_PTR(o))->type->name == MP_QSTR_bound_method))
+
 enum {
     TIMER_MODE_ONESHOT,
     TIMER_MODE_PERIODIC,
@@ -87,7 +89,7 @@ STATIC mp_obj_t timer_timer_make_new(const mp_obj_type_t *type, size_t n_args, s
     self->fast = args[ARG_fast].u_bool;
 
     // callback function
-    if (MP_OBJ_IS_FUN(args[ARG_function].u_obj)) {
+    if (MP_OBJ_IS_FUN(args[ARG_function].u_obj) || MP_OBJ_IS_METH(args[ARG_function].u_obj)) {
         self->function = args[ARG_function].u_obj;
     } else if (args[ARG_function].u_obj == mp_const_none) {
         self->function = NULL;

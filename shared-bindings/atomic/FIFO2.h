@@ -25,24 +25,24 @@
  * THE SOFTWARE.
  */
 
-#ifndef MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO_H
-#define MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO_H
+#ifndef MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO2_H
+#define MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO2_H
 
 #include "common-hal/atomic/FIFO.h"
+#include "common-hal/atomic/FIFO2.h"
+
+#include "py/objlist.h"
 
 // Type object used in Python. Should be shared between ports.
-extern const mp_obj_type_t atomic_fifo_type;
+extern const mp_obj_type_t atomic_fifo2_type;
 
 // Initializes the hardware peripheral.
-extern void common_hal_atomic_fifo_construct(atomic_fifo_obj_t *self, mp_int_t size);
+extern void common_hal_atomic_fifo2_construct(atomic_fifo2_obj_t *self, mp_int_t size);
 
-// Add item to the end of the fifo. Returns false if fifo is full.
-extern bool common_hal_atomic_fifo_put(atomic_fifo_obj_t *self, mp_obj_t item);
+// Add item to the end of the fifo2. Raises IndexError if fifo is full.
+extern void common_hal_atomic_fifo2_put(atomic_fifo2_obj_t *self, mp_obj_t item1, mp_obj_t item2);
 
-// Remove oldest entry in fifo. Returns item or raises IndexError if fifo is empty.
-extern mp_obj_t common_hal_atomic_fifo_get(atomic_fifo_obj_t *self);
+// Remove oldest entry in fifo2. Returns raises IndexError if fifo is empty.
+extern void common_hal_atomic_fifo2_get(atomic_fifo2_obj_t *self, mp_obj_list_t *ret);
 
-// Returns number of items presently stored in fifo.
-extern int32_t common_hal_atomic_fifo_len(atomic_fifo_obj_t *self);
-
-#endif // MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO_H
+#endif // MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO2_H

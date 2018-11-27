@@ -40,12 +40,16 @@
 //| ====================================================================================
 //|
 //| Wrapper for nRF5 SDK v15.2.0 Atomic FIFO.
+//|
 //| Consult documentation at https://infocenter.nordicsemi.com
 //| (nRF5 v15.2.0 SDK --> Libraries --> AtomicFIFO) for capabilities and limitations.
 //|
+//| The `put` operation may be called from interrupt handlers. All other operations
+//| (`get`, `len`, `bool`) are not interrupt safe.
+//|
 //| .. class:: FIFO(size)
 //|
-//|   Create FIFO of specified fixed size.
+//|   Create FIFO of specified fixed size. Supports operations `len` and `bool`.
 //|
 //|   :param ~int size
 //|
@@ -64,12 +68,28 @@ STATIC mp_obj_t atomic_fifo_make_new(const mp_obj_type_t *type, mp_uint_t n_args
 //|
 //|     Add item. Returns False if queue is full.
 //|
+//|     May be called from interrupt handler, including nested calls.
+//|
 STATIC mp_obj_t atomic_fifo_obj_put(mp_obj_t self_in, mp_obj_t item) {
     atomic_fifo_obj_t *self = MP_OBJ_TO_PTR(self_in);
     bool res = common_hal_atomic_fifo_put(self, item);
     return mp_obj_new_bool(res);
 }
 MP_DEFINE_CONST_FUN_OBJ_2(atomic_fifo_put_obj, atomic_fifo_obj_put);
+
+//|   .. method:: put_fail
+//|
+//|     Add item. Raises IndexError when full.
+//|
+//|     May be called from interrupt handler, including nested calls.
+//|
+STATIC mp_obj_t atomic_fifo_obj_put_fail(mp_obj_t self_in, mp_obj_t item) {
+    atomic_fifo_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    bool res = common_hal_atomic_fifo_put(self, item);
+    if (!res) mp_raise_IndexError(translate("fifo full"));
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_2(atomic_fifo_put_fail_obj, atomic_fifo_obj_put_fail);
 
 //|   .. method:: get
 //|
@@ -82,9 +102,20 @@ STATIC mp_obj_t atomic_fifo_obj_get(mp_obj_t self_in) {
 }
 MP_DEFINE_CONST_FUN_OBJ_1(atomic_fifo_get_obj, atomic_fifo_obj_get);
 
+STATIC mp_obj_t atomic_fifo_unary_op(mp_unary_op_t op, mp_obj_t self_in) {
+    atomic_fifo_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    int32_t len = common_hal_atomic_fifo_len(self);
+    switch (op) {
+        case MP_UNARY_OP_BOOL: return mp_obj_new_bool(len != 0);
+        case MP_UNARY_OP_LEN:  return MP_OBJ_NEW_SMALL_INT(len);
+        default: return MP_OBJ_NULL; // op not supported
+    }
+}
+
 STATIC const mp_rom_map_elem_t atomic_fifo_locals_dict_table[] = {
-    { MP_ROM_QSTR(MP_QSTR_put),    MP_ROM_PTR(&atomic_fifo_put_obj) },
-    { MP_ROM_QSTR(MP_QSTR_get),    MP_ROM_PTR(&atomic_fifo_get_obj) },
+    { MP_ROM_QSTR(MP_QSTR_get),       MP_ROM_PTR(&atomic_fifo_get_obj) },
+    { MP_ROM_QSTR(MP_QSTR_put),       MP_ROM_PTR(&atomic_fifo_put_obj) },
+    { MP_ROM_QSTR(MP_QSTR_put_fail),  MP_ROM_PTR(&atomic_fifo_put_fail_obj) },
 };
 STATIC MP_DEFINE_CONST_DICT(atomic_fifo_locals_dict, atomic_fifo_locals_dict_table);
 
@@ -92,5 +123,6 @@ const mp_obj_type_t atomic_fifo_type = {
     { &mp_type_type },
     .name = MP_QSTR_FIFO,
     .make_new = atomic_fifo_make_new,
+    .unary_op = atomic_fifo_unary_op,
     .locals_dict = (mp_obj_dict_t*)&atomic_fifo_locals_dict,
 };

@@ -32,6 +32,7 @@
 // #include "shared-bindings/microcontroller/Pin.h"
 #include "shared-bindings/atomic/__init__.h"
 #include "shared-bindings/atomic/FIFO.h"
+#include "shared-bindings/atomic/FIFO2.h"
 
 //| :mod:`atomic` --- Atomic operations
 //| ========================================================
@@ -51,12 +52,13 @@
 //|
 //|     FIFO
 //|
-//| .. warning:: This module has been tested only on the NRF52840 port.
+//| .. warning:: This module if for the NRF52840 port. API subject to change.
 //|
 
 STATIC const mp_rom_map_elem_t atomic_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_atomic) },
-    { MP_ROM_QSTR(MP_QSTR_FIFO), MP_ROM_PTR(&atomic_fifo_type) },
+    { MP_ROM_QSTR(MP_QSTR_FIFO),     MP_ROM_PTR(&atomic_fifo_type) },
+    { MP_ROM_QSTR(MP_QSTR_FIFO2),    MP_ROM_PTR(&atomic_fifo2_type) },
 };
 
 STATIC MP_DEFINE_CONST_DICT(atomic_module_globals, atomic_module_globals_table);

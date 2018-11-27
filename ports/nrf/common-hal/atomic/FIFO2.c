@@ -25,47 +25,37 @@
  * THE SOFTWARE.
  */
 
-#include "shared-bindings/atomic/FIFO.h"
+#include "shared-bindings/atomic/FIFO2.h"
 #include "py/mperrno.h"
 #include "py/runtime.h"
+#include "py/objlist.h"
 #include "supervisor/shared/translate.h"
 
-#include "nrf_atfifo/nrf_atfifo.c"
-
-void common_hal_atomic_fifo_construct(atomic_fifo_obj_t *self, mp_int_t size) {
-    uint32_t item_size = sizeof(mp_obj_t);
+void common_hal_atomic_fifo2_construct(atomic_fifo2_obj_t *self, mp_int_t size) {
+    uint32_t item_size = 2*sizeof(mp_obj_t);
     uint32_t buf_size = (size+1) * item_size;
     void *buf = m_malloc(buf_size, true);
-    ret_code_t err_code = nrf_atfifo_init(&(self->fifo_instance), buf, buf_size, item_size);
+    ret_code_t err_code = nrf_atfifo_init(&(self->fifo2_instance), buf, buf_size, item_size);
     if (err_code != NRF_SUCCESS) mp_raise_ValueError(translate("init failed"));
 }
 
-bool common_hal_atomic_fifo_put(atomic_fifo_obj_t *self, mp_obj_t item) {
+void common_hal_atomic_fifo2_put(atomic_fifo2_obj_t *self, mp_obj_t item1, mp_obj_t item2) {
     nrf_atfifo_item_put_t context;
     mp_obj_t *dst;
-    if ((dst = nrf_atfifo_item_alloc(&(self->fifo_instance), &context)) != NULL) {
-        *dst = item;
-        nrf_atfifo_item_put(&(self->fifo_instance), &context);
-        return true;
+    if ((dst = nrf_atfifo_item_alloc(&(self->fifo2_instance), &context)) != NULL) {
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS
+        *dst     = item1;
+        *(dst+1) = item2;
+        nrf_atfifo_item_put(&(self->fifo2_instance), &context);
+    } else {
+        mp_raise_IndexError(translate("fifo full"));
     }
-    return false;   // buffer full
 }
 
-mp_obj_t common_hal_atomic_fifo_get(atomic_fifo_obj_t *self) {
-    mp_obj_t item;
-    ret_code_t err_code = nrf_atfifo_get_free(&(self->fifo_instance), &item, sizeof(mp_obj_t), NULL);
+void common_hal_atomic_fifo2_get(atomic_fifo2_obj_t *self, mp_obj_list_t *ret) {
+    ret_code_t err_code = nrf_atfifo_get_free(&(self->fifo2_instance), ret->items, 2*sizeof(mp_obj_t), NULL);
     if (err_code != NRF_SUCCESS) mp_raise_IndexError(translate("fifo empty"));
-    return item;
-}
-
-// number of items allocated
-// Note: during an interrupt, space may have been allocated but the
-// content not yet copied into the fifo.
-// Do not call from interrupt handler!
-int32_t common_hal_atomic_fifo_len(atomic_fifo_obj_t *self) {
-    int32_t head = self->fifo_instance.head.tag & 0xffff;
-    int32_t tail = self->fifo_instance.tail.tag & 0xffff;
-    int32_t len = tail - head;
-    if (len < 0) len += self->fifo_instance.buf_size;
-    return len / self->fifo_instance.item_size;
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS   CHECK THIS
 }
