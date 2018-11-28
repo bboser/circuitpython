@@ -155,9 +155,8 @@ SRC_COMMON_HAL += \
 	time/__init__.c \
 	timer/Timer.c \
 	timer/__init__.c \
-	atomic/FIFO.c \
-	atomic/FIFO2.c \
-	atomic/__init__.c \
+	_iot/AtomicFIFO.c \
+	_iot/__init__.c \
 
 ifneq ($(SD), )
 SRC_COMMON_HAL += \
@@ -224,6 +223,7 @@ SRC_SHARED_BINDINGS = \
 	random/__init__.c \
 	utime/__init__.c \
 	timer/Chronometer.c \
+	_iot/waitq.c \
 
 # USB source files for nrf52840
 ifeq ($(MCU_SUB_VARIANT),nrf52840)

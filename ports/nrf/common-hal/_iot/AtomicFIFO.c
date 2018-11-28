@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  */
 
-#include "shared-bindings/atomic/FIFO.h"
+#include "shared-bindings/_iot/AtomicFIFO.h"
 #include "py/mperrno.h"
 #include "py/runtime.h"
 #include "supervisor/shared/translate.h"

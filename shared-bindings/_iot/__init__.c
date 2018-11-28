@@ -29,41 +29,39 @@
 #include "py/obj.h"
 #include "py/runtime.h"
 
-// #include "shared-bindings/microcontroller/Pin.h"
-#include "shared-bindings/atomic/__init__.h"
-#include "shared-bindings/atomic/FIFO.h"
-#include "shared-bindings/atomic/FIFO2.h"
+#include "shared-bindings/_iot/__init__.h"
+#include "shared-bindings/_iot/AtomicFIFO.h"
+#include "shared-bindings/_iot/waitq.h"
 
-//| :mod:`atomic` --- Atomic operations
+//| :mod:`_iot` --- Experimental stuff (temporary)
 //| ========================================================
 //|
-//| .. module:: atomic
-//|   :synopsis: Interrupt safe atomic opeations
+//| .. module:: _iot
+//|   :synopsis: Diverse operations
 //|   :platform: NRF52840
 //|
-//| Specialized module implementing non-standard interrupt safe
-//| operations. No guarantee for portability.
-//| Check code for implementation limitations before using.
+//| Trying out stuff.
+//| Read code for documentation and implementation limitations before using.
 //|
 //| Libraries
 //|
 //| .. toctree::
 //|     :maxdepth: 3
 //|
-//|     FIFO
+//|     AtomicFIFO, waitq
 //|
 //| .. warning:: This module if for the NRF52840 port. API subject to change.
 //|
 
-STATIC const mp_rom_map_elem_t atomic_module_globals_table[] = {
-    { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_atomic) },
-    { MP_ROM_QSTR(MP_QSTR_FIFO),     MP_ROM_PTR(&atomic_fifo_type) },
-    { MP_ROM_QSTR(MP_QSTR_FIFO2),    MP_ROM_PTR(&atomic_fifo2_type) },
+STATIC const mp_rom_map_elem_t _iot_module_globals_table[] = {
+    { MP_ROM_QSTR(MP_QSTR___name__),     MP_ROM_QSTR(MP_QSTR__iot) },
+    { MP_ROM_QSTR(MP_QSTR_AtomicFIFO),   MP_ROM_PTR(&atomic_fifo_type) },
+    { MP_ROM_QSTR(MP_QSTR_waitq),        MP_ROM_PTR(&_iot_waitq_type) },
 };
 
-STATIC MP_DEFINE_CONST_DICT(atomic_module_globals, atomic_module_globals_table);
+STATIC MP_DEFINE_CONST_DICT(_iot_module_globals, _iot_module_globals_table);
 
-const mp_obj_module_t atomic_module = {
+const mp_obj_module_t _iot_module = {
     .base = { &mp_type_module },
-    .globals = (mp_obj_dict_t*)&atomic_module_globals,
+    .globals = (mp_obj_dict_t*)&_iot_module_globals,
 };

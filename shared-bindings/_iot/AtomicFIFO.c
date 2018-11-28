@@ -26,7 +26,7 @@
 
 #include <stdint.h>
 
-#include "shared-bindings/atomic/FIFO.h"
+#include "shared-bindings/_iot/AtomicFIFO.h"
 #include "shared-bindings/util.h"
 
 #include "lib/utils/context_manager_helpers.h"
@@ -121,7 +121,7 @@ STATIC MP_DEFINE_CONST_DICT(atomic_fifo_locals_dict, atomic_fifo_locals_dict_tab
 
 const mp_obj_type_t atomic_fifo_type = {
     { &mp_type_type },
-    .name = MP_QSTR_FIFO,
+    .name = MP_QSTR_AtomicFIFO,
     .make_new = atomic_fifo_make_new,
     .unary_op = atomic_fifo_unary_op,
     .locals_dict = (mp_obj_dict_t*)&atomic_fifo_locals_dict,

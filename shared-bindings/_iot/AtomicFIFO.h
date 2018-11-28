@@ -28,7 +28,7 @@
 #ifndef MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO_H
 #define MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC_FIFO_H
 
-#include "common-hal/atomic/FIFO.h"
+#include "common-hal/_iot/AtomicFIFO.h"
 
 // Type object used in Python. Should be shared between ports.
 extern const mp_obj_type_t atomic_fifo_type;

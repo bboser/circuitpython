@@ -1,8 +1,9 @@
 /*
- * This file is part of the MicroPython project, http://micropython.org/
+ * This file is part of the Micro Python project, http://micropython.org/
  *
  * The MIT License (MIT)
  *
+ * Copyright (c) 2016 Glenn Ruben Bakke
  * Copyright (c) 2018 Bernhard Boser
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,11 +25,12 @@
  * THE SOFTWARE.
  */
 
-#ifndef MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC___INIT___H
-#define MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC___INIT___H
+#ifndef MICROPY_INCLUDED_SHARED_BINDINGS__IOT_WAITQ_H
+#define MICROPY_INCLUDED_SHARED_BINDINGS__IOT_WAITQ_H
 
-#include "py/obj.h"
+#include "common-hal/_iot/AtomicFIFO.h"
 
-// Nothing now.
+// Type object used in Python. Should be shared between ports.
+extern const mp_obj_type_t _iot_waitq_type;
 
-#endif  // MICROPY_INCLUDED_SHARED_BINDINGS_ATOMIC___INIT___H
+#endif // MICROPY_INCLUDED_SHARED_BINDINGS__IOT_WAITQ_H
