@@ -34,3 +34,4 @@ Known Bugs
 ----------
 
 - Errors in interrupt handler crash VM (wish I knew why)
+- Digitalinout.deinit does not correctly "deinit" gpiote (only relevant for irq)

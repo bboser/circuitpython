@@ -124,7 +124,8 @@ void common_hal_digitalio_digitalinout_deinit(digitalio_digitalinout_obj_t *self
         return;
     }
     int pn = self->pin->number;
-    nrfx_gpiote_in_uninit(pn);
+    // something here crashes the VM!
+    // nrfx_gpiote_in_uninit(pn);
     nrf_gpio_cfg_default(pn);
     reset_pin_number(pn);
     MP_STATE_PORT(pin_irq_handlers)[pn] = NULL;
