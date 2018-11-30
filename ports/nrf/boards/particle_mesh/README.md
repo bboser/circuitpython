@@ -21,7 +21,7 @@ Both targets run on the same hardware and assume the same pinouts.
 The `feather52840` board support package will be updated at a later date
 to reflect any pin changes in the final Feather form-factor HW.
 
-## Installing CircuitPython submodules 
+## Installing CircuitPython submodules
 
 Before you can build, you will need to run the following commands once, which
 will install the submodules that are part of the CircuitPython ecosystem, and

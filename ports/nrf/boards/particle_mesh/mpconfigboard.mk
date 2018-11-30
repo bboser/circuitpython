@@ -1,3 +1,8 @@
+USB_VID = 0x239A
+USB_PID = 0x802A
+USB_PRODUCT = "Particle nRF52840"
+USB_MANUFACTURER = "Particle IO"
+
 MCU_SERIES = m4
 MCU_VARIANT = nrf52
 MCU_SUB_VARIANT = nrf52840
@@ -14,3 +19,11 @@ else
 endif
 
 NRF_DEFINES += -DNRF52840_XXAA -DNRF52840
+
+QSPI_FLASH_FILESYSTEM = 1
+EXTERNAL_FLASH_DEVICE_COUNT = 1
+EXTERNAL_FLASH_DEVICES = "MX25L3233F"
+
+# Feather 52840:  16 Mbit GD25Q16C
+# Particle Argon: 32 Mbit MX25L3233F
+# define in ../../supervisor/shared/external_flash/devices.h

@@ -35,9 +35,9 @@ STATIC const mp_rom_map_elem_t board_module_globals_table[] = {
   { MP_ROM_QSTR(MP_QSTR_RXD), MP_ROM_PTR(&pin_P0_08) },
 
   { MP_ROM_QSTR(MP_QSTR_MODE), MP_ROM_PTR(&pin_P0_11) },
-  { MP_ROM_QSTR(MP_QSTR_LED_RED), MP_ROM_PTR(&pin_P0_13) },
-  { MP_ROM_QSTR(MP_QSTR_LED_GREEN), MP_ROM_PTR(&pin_P0_14) },
-  { MP_ROM_QSTR(MP_QSTR_LED_BLUE), MP_ROM_PTR(&pin_P0_15) },
+  { MP_ROM_QSTR(MP_QSTR_LED_R), MP_ROM_PTR(&pin_P0_13) },
+  { MP_ROM_QSTR(MP_QSTR_LED_G), MP_ROM_PTR(&pin_P0_14) },
+  { MP_ROM_QSTR(MP_QSTR_LED_B), MP_ROM_PTR(&pin_P0_15) },
 
   // Enable Lipo Charger /CHG
   { MP_ROM_QSTR(MP_QSTR__NCHG), MP_ROM_PTR(&pin_P1_09) },

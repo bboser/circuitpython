@@ -66,6 +66,24 @@ typedef struct {
     bool single_status_byte: 1;
 } external_flash_device;
 
+// Settings for Macronix MX25L3233F 4MiB SPI flash.
+// It's on the Particle mesh boards (Argon, Xenon).
+#define MX25L3233F {\
+    .total_size = (1 << 22), /* 4 MiB */ \
+    .start_up_time_us = 10000, \
+    .manufacturer_id = 0xc2, \
+    .memory_type = 0x20, \
+    .capacity = 0x16, \
+    .max_clock_speed_mhz = 8, \
+    .quad_enable_bit_mask = 0x40, \
+    .has_sector_protection = false, \
+    .supports_fast_read = true, \
+    .supports_qspi = true, \
+    .supports_qspi_writes = false, \
+    .write_status_register_split = false, \
+    .single_status_byte = true, \
+}
+
 // Settings for the Adesto Tech AT25DF081A 1MiB SPI flash. Its on the SAMD21
 // Xplained board.
 // Datasheet: https://www.adestotech.com/wp-content/uploads/doc8715.pdf
