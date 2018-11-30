@@ -184,6 +184,10 @@ endif
 
 # These don't have corresponding files in each port but are still located in
 # shared-bindings to make it clear what the contents of the modules are.
+#
+# Probably do not belong here:
+# utime/__init__c, timer/Chronometer.c, _iot/waitq.c
+# presumably there should be a corresponding entry in shared-module
 SRC_BINDINGS_ENUMS = \
 	busio/OneWire.c \
 	digitalio/Polarity.c \
@@ -193,7 +197,10 @@ SRC_BINDINGS_ENUMS = \
 	microcontroller/RunMode.c \
 	help.c \
 	math/__init__.c \
-	util.c
+	util.c \
+	utime/__init__.c \
+	timer/Chronometer.c \
+	_iot/waitq.c \
 
 ifneq ($(SD), )
 SRC_BINDINGS_ENUMS += \
@@ -216,19 +223,6 @@ SRC_SHARED_MODULE = \
 	bitbangio/SPI.c \
 	busio/OneWire.c \
 	storage/__init__.c \
-
-SRC_SHARED_BINDINGS = \
-	struct/__init__.c \
-	gamepad/__init__.c \
-	gamepad/GamePad.c \
-	bitbangio/__init__.c \
-	bitbangio/I2C.c \
-	bitbangio/SPI.c \
-	bitbangio/OneWire.c \
-	random/__init__.c \
-	utime/__init__.c \
-	timer/Chronometer.c \
-	_iot/waitq.c \
 
 # USB source files for nrf52840
 ifeq ($(MCU_SUB_VARIANT),nrf52840)

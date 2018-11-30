@@ -21,8 +21,10 @@ Change Log
 - add boards/particle_mesh
 - add timer module (including interrupts)
 - enable scheduler & emergency exception buffer
-- add microcontroller.deepsleep()
-- add _iot module
+- these are used by eventio:
+    - add microcontroller.deepsleep()
+    - add _iot module
+    - utime module
 
 Known Bugs
 ----------

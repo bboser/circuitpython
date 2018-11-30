@@ -56,7 +56,7 @@ extern uint64_t common_hal_time_monotonic(void);
 //|
 //|   Chronometer behave like stop watches: the clock starts when instantiated,
 //|   `stop()`, `resume()`, `reset()` do what the name says. The elapsed time is
-//|   is available as attribute `elapsed_time` (as a float, in seconds).
+//|   is available as attribute `elapsed_time` (float, in seconds).
 //|
 //|   For example::
 //|
