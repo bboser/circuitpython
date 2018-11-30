@@ -37,7 +37,6 @@
 #define MICROPY_PY_BUILTINS_ENUMERATE (1)
 #define MICROPY_PY_BUILTINS_HELP    (1)
 #define MICROPY_PY_BUILTINS_HELP_MODULES (1)
-#define MICROPY_PY_BUILTINS_HELP_TEXT circuitpython_help_text
 #define MICROPY_PY_BUILTINS_INPUT   (1)
 #define MICROPY_PY_BUILTINS_FILTER  (1)
 #define MICROPY_PY_BUILTINS_SET     (1)
@@ -154,6 +153,7 @@ typedef long mp_off_t;
 #define CIRCUITPY_MCU_FAMILY                        samd21
 #define MICROPY_PY_SYS_PLATFORM                     "Atmel SAMD21"
 #define PORT_HEAP_SIZE                              (16384 + 4096)
+#define SPI_FLASH_MAX_BAUDRATE 8000000
 #define CIRCUITPY_DEFAULT_STACK_SIZE                4096
 #define MICROPY_CPYTHON_COMPAT                      (0)
 #define MICROPY_MODULE_WEAK_LINKS                   (0)
@@ -163,12 +163,25 @@ typedef long mp_off_t;
 #define MICROPY_PY_IO                               (0)
 #define MICROPY_PY_REVERSE_SPECIAL_METHODS          (0)
 #define MICROPY_PY_SYS_EXC_INFO                     (0)
+#define MICROPY_PY_UERRNO_LIST \
+    X(EPERM) \
+    X(ENOENT) \
+    X(EIO) \
+    X(EAGAIN) \
+    X(ENOMEM) \
+    X(EACCES) \
+    X(EEXIST) \
+    X(ENODEV) \
+    X(EISDIR) \
+    X(EINVAL) \
+
 #endif
 
 #ifdef SAMD51
 #define CIRCUITPY_MCU_FAMILY                        samd51
 #define MICROPY_PY_SYS_PLATFORM                     "MicroChip SAMD51"
 #define PORT_HEAP_SIZE                              (0x20000) // 128KiB
+#define SPI_FLASH_MAX_BAUDRATE 24000000
 #define CIRCUITPY_DEFAULT_STACK_SIZE                8192
 #define MICROPY_CPYTHON_COMPAT                      (1)
 #define MICROPY_MODULE_WEAK_LINKS                   (1)
@@ -178,6 +191,7 @@ typedef long mp_off_t;
 #define MICROPY_PY_IO                               (1)
 #define MICROPY_PY_REVERSE_SPECIAL_METHODS          (1)
 #define MICROPY_PY_SYS_EXC_INFO                     (1)
+//      MICROPY_PY_UERRNO_LIST - Use the default
 #endif
 
 #ifdef LONGINT_IMPL_NONE
@@ -285,6 +299,14 @@ extern const struct _mp_obj_module_t wiznet_module;
         #define WIZNET_MODULE
     #endif
 
+    // (u)json depends, perhaps erroneously, on MICROPY_PY_IO
+    #if MICROPY_PY_IO
+        #define JSON_MODULE { MP_ROM_QSTR(MP_QSTR_json), MP_ROM_PTR(&mp_module_ujson) },
+        #define MICROPY_PY_UJSON                         (1)
+    #else
+        #define JSON_MODULE
+    #endif
+
 
     #ifndef EXTRA_BUILTIN_MODULES
     #define EXTRA_BUILTIN_MODULES \
@@ -296,6 +318,7 @@ extern const struct _mp_obj_module_t wiznet_module;
         NETWORK_MODULE \
         SOCKET_MODULE \
         WIZNET_MODULE \
+        JSON_MODULE \
         { MP_OBJ_NEW_QSTR(MP_QSTR_rotaryio), (mp_obj_t)&rotaryio_module }, \
         { MP_OBJ_NEW_QSTR(MP_QSTR_gamepad),(mp_obj_t)&gamepad_module }
     #endif
@@ -395,18 +418,6 @@ extern const struct _mp_obj_module_t wiznet_module;
     { MP_OBJ_NEW_QSTR(MP_QSTR_uheap),(mp_obj_t)&uheap_module }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_ustack),(mp_obj_t)&ustack_module }
 
-#define MICROPY_PY_UERRNO_LIST \
-    X(EPERM) \
-    X(ENOENT) \
-    X(EIO) \
-    X(EAGAIN) \
-    X(ENOMEM) \
-    X(EACCES) \
-    X(EEXIST) \
-    X(ENODEV) \
-    X(EISDIR) \
-    X(EINVAL) \
-
 // We need to provide a declaration/definition of alloca()
 #include <alloca.h>
 
@@ -421,8 +432,13 @@ extern const struct _mp_obj_module_t wiznet_module;
 
 #define MP_STATE_PORT MP_STATE_VM
 
+void run_background_tasks(void);
+#define MICROPY_VM_HOOK_LOOP run_background_tasks();
+#define MICROPY_VM_HOOK_RETURN run_background_tasks();
+
 #include "peripherals/samd/dma.h"
 
+#include "supervisor/flash_root_pointers.h"
 #if MICROPY_PY_NETWORK
     #define NETWORK_ROOT_POINTERS mp_obj_list_t mod_network_nic_list;
 #else
@@ -438,9 +454,6 @@ extern const struct _mp_obj_module_t wiznet_module;
     mp_obj_t gamepad_singleton; \
     NETWORK_ROOT_POINTERS \
 
-void run_background_tasks(void);
-#define MICROPY_VM_HOOK_LOOP run_background_tasks();
-#define MICROPY_VM_HOOK_RETURN run_background_tasks();
 
 #define CIRCUITPY_AUTORELOAD_DELAY_MS 500
 #define CIRCUITPY_BOOT_OUTPUT_FILE "/boot_out.txt"

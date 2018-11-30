@@ -13,7 +13,7 @@ This project is experimental. Expect changes; use CircuitPython for a more stabl
 Supported Boards
 ----------------
 
-**nRF52840 Boards** only
+nRF52840
 
 Change Log
 ----------
@@ -21,8 +21,8 @@ Change Log
 - add boards/particle_mesh
 - add timer module (including interrupts)
 - enable scheduler & emergency exception buffer
-- enable ure, ujson libraries
 - add microcontroller.deepsleep()
+- add _iot module
 
 Known Bugs
 ----------
