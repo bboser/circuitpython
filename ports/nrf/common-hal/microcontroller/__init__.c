@@ -94,6 +94,9 @@ float common_hal_mcu_deepsleep(float timeout_f) {
     float slept_sec = counter / 1024.0;
 
     // Ajust time.monotonic()
+    // Attention: an interrupt handler running before this code will see
+    // the "old" value of ticks_ms. But interrupt handlers should be used
+    // with caution anyway.
     ticks_ms += (uint64_t)(1000*slept_sec);
 
     return slept_sec;
