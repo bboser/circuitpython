@@ -20,18 +20,18 @@ nRF52840
 Change Log
 ----------
 
-- add boards/particle_mesh
-- add timer module (including interrupts)
+- ports/nrf/boards/particle_mesh
+- timer module (including interrupts)
 - digital io interrupts
 - enable scheduler & emergency exception buffer
 - these are used by eventio:
 
-    - add microcontroller.deepsleep(timeout)
-    - add _iot module
+    - microcontroller.deepsleep(timeout)
+    - _iot module
     - utime module
 
 Known Bugs
 ----------
 
 - Errors in interrupt handler crash VM (wish I knew why)
-- Digitalinout.deinit does not correctly "deinit" gpiote (only relevant for irq)
+- Digitalinout.deinit does not "deinit" gpiote (only relevant for irq). Calling gpiote deinit crashes the VM.

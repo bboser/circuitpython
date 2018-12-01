@@ -56,11 +56,11 @@ STATIC const mp_rom_map_elem_t board_module_globals_table[] = {
   { MP_ROM_QSTR(MP_QSTR__B_RX), MP_ROM_PTR(&pin_P1_04) },
   { MP_ROM_QSTR(MP_QSTR__BT_CTS), MP_ROM_PTR(&pin_P1_07) },
   { MP_ROM_QSTR(MP_QSTR__BT_RTS), MP_ROM_PTR(&pin_P1_06) },
-  // Warning: diode D2 (LED?) from WIFI_EN to /NREST
-  // configure these as inputs (at least one of them)
-  // power saving feature? (D2 LED off)
-  // P0.18 connected to reset button
-  { MP_ROM_QSTR(MP_QSTR__NREST), MP_ROM_PTR(&pin_P0_18) },
+  // Warning: diode D2 from WIFI_EN to /NREST
+  // Leave P0.18 alone or just as input (connected to reset button)
+  // Pull  P0.24 low to reset ESP32
+  // P0.18 connected to reset button (resets nRF and ESP)
+  // { MP_ROM_QSTR(MP_QSTR__NREST), MP_ROM_PTR(&pin_P0_18) },
   { MP_ROM_QSTR(MP_QSTR__WIFI_EN), MP_ROM_PTR(&pin_P0_24) },
 
 };

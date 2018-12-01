@@ -56,8 +56,8 @@ To build and flash issue the following command inside the ports/nrf/ folder:
 
 	make BOARD=pca10056
     make BOARD=pca10056 flash
-    make V=1 BOARD=pca10059  SD=s140
-    make V=1 BOARD=particle_mesh  SD=s140
+    make V=1 BOARD=pca10059 SD=s140
+    make V=1 BOARD=particle_mesh SD=s140
 
 ## Compile and Flash with Bluetooth Stack
 
