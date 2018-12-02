@@ -112,13 +112,14 @@
 #define MICROPY_PY_CMATH                         (0)
 #define MICROPY_PY_IO                            (1)
 #define MICROPY_PY_IO_FILEIO                     (1)
+#define MICROPY_PY_IO_IOBASE                     (0)
 #define MICROPY_PY_UERRNO                        (0)
 #define MICROPY_PY_UBINASCII                     (1)
 #define MICROPY_PY_URANDOM                       (0)
 #define MICROPY_PY_URANDOM_EXTRA_FUNCS           (0)
 #define MICROPY_PY_UTIMEQ                        (0)
 #define MICROPY_PY_UTIME_MP_HAL                  (0)
-#define MICROPY_PY_UCTYPES                       (1)
+#define MICROPY_PY_UCTYPES                       (0)
 #define MICROPY_PY_UZLIB                         (0)
 #define MICROPY_PY_UJSON                         (1)
 #define MICROPY_PY_URE                           (0)
@@ -229,6 +230,8 @@ extern const struct _mp_obj_module_t _iot_module;
     { MP_ROM_QSTR     (MP_QSTR_open  ), MP_ROM_PTR(&mp_builtin_open_obj) }, \
 
 #define MP_STATE_PORT MP_STATE_VM
+
+#define mp_type_textio mp_type_vfs_fat_textio
 
 #if defined(NRF52840_XXAA)
 #define NUM_OF_PINS 48

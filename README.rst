@@ -24,7 +24,7 @@ Change Log
 - timer module (including interrupts)
 - digital io interrupts
 - enable scheduler & emergency exception buffer
-- these are used by eventio:
+- these are used by .. _eventio: https://github.com/bboser/eventio
 
     - microcontroller.deepsleep(timeout)
     - _iot module
