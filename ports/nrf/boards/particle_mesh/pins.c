@@ -12,7 +12,7 @@ STATIC const mp_rom_map_elem_t board_module_globals_table[] = {
 
   // 0.71 * VBAT
   { MP_ROM_QSTR(MP_QSTR_VBAT_DET), MP_ROM_PTR(&pin_P0_05) },
-  // 0.64 * VUSB
+  // Digital input: detect usb voltage presence, 0.64 * VUSB
   { MP_ROM_QSTR(MP_QSTR_VUSB_DET), MP_ROM_PTR(&pin_P0_12) },
 
   { MP_ROM_QSTR(MP_QSTR_D2), MP_ROM_PTR(&pin_P1_01) },
@@ -39,7 +39,7 @@ STATIC const mp_rom_map_elem_t board_module_globals_table[] = {
   { MP_ROM_QSTR(MP_QSTR_LED_G), MP_ROM_PTR(&pin_P0_14) },
   { MP_ROM_QSTR(MP_QSTR_LED_B), MP_ROM_PTR(&pin_P0_15) },
 
-  // Enable Lipo Charger /CHG
+  // Lipo Charger
   { MP_ROM_QSTR(MP_QSTR__NCHG), MP_ROM_PTR(&pin_P1_09) },
   // BT Antenna Select: VCTL1, VCTL2 on SKY13351-378LF
   // ANT1=0, ANT2=1 -> PCB Antenna
@@ -50,17 +50,10 @@ STATIC const mp_rom_map_elem_t board_module_globals_table[] = {
   // esp32
   { MP_ROM_QSTR(MP_QSTR__BOOT_W), MP_ROM_PTR(&pin_P0_16) },
   { MP_ROM_QSTR(MP_QSTR__HOST_WAKE), MP_ROM_PTR(&pin_P0_07) },
-  // RX on esp32
   { MP_ROM_QSTR(MP_QSTR__B_TX), MP_ROM_PTR(&pin_P1_05) },
-  // TX on esp32
   { MP_ROM_QSTR(MP_QSTR__B_RX), MP_ROM_PTR(&pin_P1_04) },
   { MP_ROM_QSTR(MP_QSTR__BT_CTS), MP_ROM_PTR(&pin_P1_07) },
   { MP_ROM_QSTR(MP_QSTR__BT_RTS), MP_ROM_PTR(&pin_P1_06) },
-  // Warning: diode D2 from WIFI_EN to /NREST
-  // Leave P0.18 alone or just as input (connected to reset button)
-  // Pull  P0.24 low to reset ESP32
-  // P0.18 connected to reset button (resets nRF and ESP)
-  // { MP_ROM_QSTR(MP_QSTR__NREST), MP_ROM_PTR(&pin_P0_18) },
   { MP_ROM_QSTR(MP_QSTR__WIFI_EN), MP_ROM_PTR(&pin_P0_24) },
 
 };
